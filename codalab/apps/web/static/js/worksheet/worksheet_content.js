@@ -151,7 +151,6 @@ var WorksheetContent = function() {
 
                     ws_item.state.raw_size = raw_size;
                     break; //break out of case 'markup':
-                case 'inline':
                 case 'table':
                 case 'contents':
                 case 'html':
