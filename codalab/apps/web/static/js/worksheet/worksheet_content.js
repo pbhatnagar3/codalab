@@ -136,7 +136,7 @@ var WorksheetContent = function() {
                                 // that bundle may be the start of the next non-markdown block
                                 // or a line that begins with %, which means another bundle display type
                                 if(bundle){
-                                    if(raw[i].search(bundle.uuid) > -1 || (raw[i].lastIndexOf('%', 0) === 0)){
+                                    if(raw[i] != undefined && (raw[i].search(bundle.uuid) > -1 || (raw[i].lastIndexOf('%', 0) === 0))){
                                         raw_size = i - last_raw_index;
                                         break;
                                     }else{
@@ -170,7 +170,7 @@ var WorksheetContent = function() {
 
                     var found = false;
                     for(i=last_raw_index; i < raw.length; i++){
-                        if(raw[i].search(bundle.uuid) > -1){
+                        if(raw[i] != undefined && (raw[i].search(bundle.uuid) > -1)){
                             raw_size = i - last_raw_index + 1;
                             found = true;
                         }else{

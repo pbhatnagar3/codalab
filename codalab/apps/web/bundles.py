@@ -150,6 +150,7 @@ if len(settings.BUNDLE_SERVICE_URL) > 0:
             In the future, for large worksheets, might want to break this up so
             that we can render something basic.
             '''
+            resulting_items_map = {}
             try:
                 worksheet_info = self.client.get_worksheet_info(uuid, fetch_items, get_permissions)
             except PermissionError:
@@ -157,6 +158,10 @@ if len(settings.BUNDLE_SERVICE_URL) > 0:
 
             if fetch_items:
                 worksheet_info['raw'] = worksheet_util.get_worksheet_lines(worksheet_info)
+
+                temp_mapping = {}
+                for i, raw_info in enumerate(worksheet_info['raw']):
+                    temp_mapping[str(raw_info)] = i
 
             # Set permissions
             worksheet_info['edit_permission'] = (worksheet_info['permission'] == GROUP_OBJECT_PERMISSION_ALL)
@@ -168,7 +173,7 @@ if len(settings.BUNDLE_SERVICE_URL) > 0:
             # Go and fetch more information about the worksheet contents by
             # resolving the interpreted items.
             if interpreted:
-                interpreted_items = worksheet_util.interpret_items(
+                interpreted_items, raw_interpreted_items_map = worksheet_util.interpret_items(
                                     worksheet_util.get_default_schemas(),
                                     worksheet_info['items'])
                 worksheet_info['items'] = self.client.resolve_interpreted_items(interpreted_items['items'])
@@ -197,6 +202,29 @@ if len(settings.BUNDLE_SERVICE_URL) > 0:
                             except Exception, e:
                                 print e
                                 import ipdb; ipdb.set_trace()
+                for k in temp_mapping.keys():
+                    resulting_items_map[k] = worksheet_info['items'][temp_mapping[k] % len(worksheet_info['items'])]
+
+                print '**'* 20
+                print "STATISTICS"
+                print "length of the temp_map (the map from the raw Lines to the raw_items is)", len(temp_mapping)
+                print "the length of the intermediate map between the raw_items and the interpreted_items is", len(raw_interpreted_items_map)
+                print ""
+                print ""
+                print ""
+                print "temp_mapping", temp_mapping
+                print ""
+                print ""
+                print ""
+                print 'raw_interpreted_items_map', raw_interpreted_items_map
+
+                print ""
+                print ""
+                print ""
+                print ""
+                print 'resulting map', resulting_items_map
+
+                print '**'* 20
 
             return worksheet_info
 
