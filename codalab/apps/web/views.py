@@ -1405,7 +1405,7 @@ class WorksheetDetailView(TemplateView):
         if self.request.user.is_authenticated():
             context['home_worksheet_name'] = service.home_worksheet(self.request.user.username)
         # Set the title to something sane.
-        worksheet_info = service.basic_worksheet(uuid)
+        worksheet_info, _ = service.basic_worksheet(uuid)
         context['worksheet_uuid'] = worksheet_info['uuid']
         context['worksheet_title'] = worksheet_info.get('title', worksheet_info.get('name', ''))
         return context

@@ -202,8 +202,9 @@ if len(settings.BUNDLE_SERVICE_URL) > 0:
                             except Exception, e:
                                 print e
                                 import ipdb; ipdb.set_trace()
-                for k in temp_mapping.keys():
-                    resulting_items_map[k] = worksheet_info['items'][temp_mapping[k] % len(worksheet_info['items'])]
+                for k,v in temp_mapping.iteritems():
+                    # resulting_items_map[k] = worksheet_info['items'][temp_mapping[k] % len(worksheet_info['items'])]
+                    resulting_items_map[k] = raw_interpreted_items_map[v]
 
                 print '**'* 20
                 print "STATISTICS"
@@ -226,7 +227,7 @@ if len(settings.BUNDLE_SERVICE_URL) > 0:
 
                 print '**'* 20
 
-            return worksheet_info
+            return (worksheet_info, resulting_items_map)
 
         def upload_bundle(self, source_file, bundle_type, worksheet_uuid):
             '''
