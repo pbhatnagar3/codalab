@@ -167,7 +167,19 @@ var Worksheet = React.createClass({
           if (this.canEdit()) {
             var editor = ace.edit('worksheet-editor');
             this.state.ws.state.raw = editor.getValue().split('\n');
-            this.setState({editMode: editMode});  // Needs to be after getting the raw contents
+            var cursorPosition = editor.getCursorPosition().row;
+            var line = editor.session.getLine(cursorPosition);
+            var jumpTo = this.state.ws.state.raw_interpreted_items_map[line];
+            while ((line == '' || jumpTo === undefined) && currentPosition >= 0) {
+                cursorPosition -= 1;
+                line = editor.session.getLine(cursorPosition);
+                jumpTo = this.state.ws.state.raw_interpreted_items_map[line];
+            }
+            if (jumpTo != undefined) {
+                this.setState({editMode: editMode, jumpTo: jumpTo.trim()});  // Needs to be after getting the raw contents
+            } else {
+                this.setState({editMode: editMode});  // Needs to be after getting the raw contents
+            }
             this.saveAndUpdateWorksheet(true);
           } else {
             // Not allowed to save worksheet.
@@ -176,17 +188,28 @@ var Worksheet = React.createClass({
           // Go into edit mode.
           this.setState({editMode: editMode});  // Needs to be before focusing
           this.setState({activeComponent: 'textarea'});
-          // TODO: set cursor intelligently rather than just leaving it at the beginning.
-          $("#raw-textarea").focus();
         }
     },
     componentDidUpdate: function() {
         try {
-            var editor = ace.edit('worksheet-editor');
-            editor.setTheme("ace/theme/twilight");
-            editor.session.setMode("ace/mode/python");
+            if (this.state.editMode) {
+                    var editor = ace.edit('worksheet-editor');
+                    editor.setTheme("ace/theme/twilight");
+                    editor.session.setMode("ace/mode/python");
+            }
+            if (!this.state.editMode && this.state.jumpTo != undefined) {
+                console.log("WILL JUMP TO: ", this.state.jumpTo);
+                $('#worksheet_content').html($('#worksheet_content').html().replace(this.state.jumpTo, '<a id="imhere"></a>'+this.state.jumpTo));
+                $('.ws-container').animate({
+                    scrollTop: $('#imhere').offset().top - 500
+                    }, 100
+                );
+                $('#worksheet_content').html($('#worksheet_content').html().replace('<a id="imhere"></a>'+this.state.jumpTo, this.state.jumpTo));
+                this.setState({jumpTo: undefined});
+            }
         }
         catch(error) {
+            console.log(' A scrolling error occurred: ', error);
         }
     },
     toggleActionBar: function() {

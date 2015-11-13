@@ -159,10 +159,6 @@ if len(settings.BUNDLE_SERVICE_URL) > 0:
             if fetch_items:
                 worksheet_info['raw'] = worksheet_util.get_worksheet_lines(worksheet_info)
 
-                temp_mapping = {}
-                for i, raw_info in enumerate(worksheet_info['raw']):
-                    temp_mapping[str(raw_info)] = i
-
             # Set permissions
             worksheet_info['edit_permission'] = (worksheet_info['permission'] == GROUP_OBJECT_PERMISSION_ALL)
             # Format permissions into strings
@@ -202,32 +198,20 @@ if len(settings.BUNDLE_SERVICE_URL) > 0:
                             except Exception, e:
                                 print e
                                 import ipdb; ipdb.set_trace()
-                for k,v in temp_mapping.iteritems():
-                    # resulting_items_map[k] = worksheet_info['items'][temp_mapping[k] % len(worksheet_info['items'])]
-                    resulting_items_map[k] = raw_interpreted_items_map[v]
 
-                print '**'* 20
-                print "STATISTICS"
-                print "length of the temp_map (the map from the raw Lines to the raw_items is)", len(temp_mapping)
-                print "the length of the intermediate map between the raw_items and the interpreted_items is", len(raw_interpreted_items_map)
-                print ""
-                print ""
-                print ""
-                print "temp_mapping", temp_mapping
-                print ""
-                print ""
-                print ""
-                print 'raw_interpreted_items_map', raw_interpreted_items_map
+                for i, raw_info in enumerate(worksheet_info['raw']):
 
-                print ""
-                print ""
-                print ""
-                print ""
-                print 'resulting map', resulting_items_map
+                    interpreted_item = raw_interpreted_items_map[i]
+                    index = i - 1
+                    # for the raw_lines that would not have any representation
+                    while (interpreted_item is None or interpreted_item == '') and index > 1:
+                        interpreted_item = raw_interpreted_items_map[index]
+                        index -= 1
 
-                print '**'* 20
+                    resulting_items_map[str(raw_info)] = interpreted_item
 
-            return (worksheet_info, resulting_items_map)
+            worksheet_info['raw_interpreted_items_map'] = resulting_items_map
+            return worksheet_info
 
         def upload_bundle(self, source_file, bundle_type, worksheet_uuid):
             '''

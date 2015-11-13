@@ -75,7 +75,7 @@ var WorksheetContent = function() {
                 // this is the first item. Let's get the index after the comments stop
                 // and the real worksheet begins
                 for(i=0; i < raw.length; i++){
-                    if(raw[i].lastIndexOf('//', 0) === 0){
+                    if(raw[i] != undefined && raw[i].lastIndexOf('//', 0) === 0){
                         last_raw_index = i+1;
                     }else{
                         break; // break out, we are done with comments
@@ -101,7 +101,7 @@ var WorksheetContent = function() {
                             for(i=last_raw_index; i < raw.length; i++){
                                 // that bundle may be the start of the next non-markdown block
                                 // or a line that begins with %, which means another bundle display type
-                                if((raw[i].lastIndexOf('[worksheet', 0) === 0)){
+                                if(raw[i] != undefined && (raw[i].lastIndexOf('[worksheet', 0) === 0)){
                                     raw_size = i - last_raw_index;
                                     break;
                                 }else{
@@ -112,7 +112,7 @@ var WorksheetContent = function() {
                         case 'search':
                             for(i=last_raw_index; i < raw.length; i++){
                                 //a line that begins with %, which means another bundle display type
-                                if((raw[i].lastIndexOf('%', 0) === 0)){
+                                if(raw[i] != undefined && (raw[i].lastIndexOf('%', 0) === 0)){
                                     raw_size = i - last_raw_index;
                                     break;
                                 }else{
