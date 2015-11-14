@@ -168,9 +168,12 @@ var Worksheet = React.createClass({
             var editor = ace.edit('worksheet-editor');
             this.state.ws.state.raw = editor.getValue().split('\n');
             var cursorPosition = editor.getCursorPosition().row;
+            if (cursorPosition === undefined) {
+                cursorPosition = 0;
+            }
             var line = editor.session.getLine(cursorPosition);
             var jumpTo = this.state.ws.state.raw_interpreted_items_map[line];
-            while ((line == '' || jumpTo === undefined) && currentPosition >= 0) {
+            while ((line == '' || jumpTo === undefined) && cursorPosition >= 0) {
                 cursorPosition -= 1;
                 line = editor.session.getLine(cursorPosition);
                 jumpTo = this.state.ws.state.raw_interpreted_items_map[line];
@@ -186,6 +189,12 @@ var Worksheet = React.createClass({
           }
         } else {
           // Go into edit mode.
+          // if (window.getSelection) {
+          //       var selectedText = window.getSelection().toString();
+          //       console.log("checkout this selected text bro", selectedText);
+          // this.setState({editMode: editMode, selectedText: selectedText});  // Needs to be before focusing
+
+          // }
           this.setState({editMode: editMode});  // Needs to be before focusing
           this.setState({activeComponent: 'textarea'});
         }
@@ -193,9 +202,12 @@ var Worksheet = React.createClass({
     componentDidUpdate: function() {
         try {
             if (this.state.editMode) {
-                    var editor = ace.edit('worksheet-editor');
-                    editor.setTheme("ace/theme/twilight");
-                    editor.session.setMode("ace/mode/python");
+                var editor = ace.edit('worksheet-editor');
+                editor.setTheme("ace/theme/twilight");
+                editor.session.setMode("ace/mode/python");
+                // if (this.state.selectedText != undefined) {
+                //     console.log(this.state.ws.state.visual_raw_map[this.state.selectedText]);
+                // }        
             }
             if (!this.state.editMode && this.state.jumpTo != undefined) {
                 console.log("WILL JUMP TO: ", this.state.jumpTo);

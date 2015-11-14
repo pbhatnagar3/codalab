@@ -151,6 +151,7 @@ if len(settings.BUNDLE_SERVICE_URL) > 0:
             that we can render something basic.
             '''
             resulting_items_map = {}
+            visual_raw_map = {}
             try:
                 worksheet_info = self.client.get_worksheet_info(uuid, fetch_items, get_permissions)
             except PermissionError:
@@ -200,7 +201,6 @@ if len(settings.BUNDLE_SERVICE_URL) > 0:
                                 import ipdb; ipdb.set_trace()
 
                 for i, raw_info in enumerate(worksheet_info['raw']):
-
                     interpreted_item = raw_interpreted_items_map[i]
                     index = i - 1
                     # for the raw_lines that would not have any representation
@@ -210,7 +210,13 @@ if len(settings.BUNDLE_SERVICE_URL) > 0:
 
                     resulting_items_map[str(raw_info)] = interpreted_item
 
+                # for i, raw_info in enumerate(worksheet_info['raw']):
+                #     key = resulting_items_map[str(raw_info)]
+                #     print key
+                #     visual_raw_map[str(resulting_items_map[str(raw_info)])] = i
+
             worksheet_info['raw_interpreted_items_map'] = resulting_items_map
+            visual_raw_map['visual_raw_map'] = visual_raw_map
             return worksheet_info
 
         def upload_bundle(self, source_file, bundle_type, worksheet_uuid):
